@@ -1,6 +1,9 @@
 package org.ghayuros
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -8,13 +11,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 
-fun main(args: Array<String>) {
-    val geminiBody = "{\"contents\": [{ \"parts\": [{\"text\": \"${args[0]}\"}] }]}"
-    val localLLMBody = """{
+
+suspend fun main(args: Array<String>) {
+        val geminiBody = "{\"contents\": [{ \"parts\": [{\"text\": \"${args[0]}\"}] }]}"
+        val localLLMBody = """{
     "model": "deepseek-r1-distill-qwen-14b",
     "messages": [
-    { "role": "system", "content": "Always answer in rhymes." },
-    { "role": "user", "content": "Introduce yourself." }
+    { "role": "user", "content": "How to learn Kotlin?" }
     ],
     "temperature": 0.7,
     "max_tokens": 5000,
@@ -43,7 +46,7 @@ fun callGemini(input: String): String {
     }
 }
 
-fun callLocalLLM(input: String): String {
+suspend fun callLocalLLM(input: String): String {
     val logger = KotlinLogging.logger {}
     val url = "http://localhost:1234/api/v0/chat/completions"
     val request = Request.Builder()
