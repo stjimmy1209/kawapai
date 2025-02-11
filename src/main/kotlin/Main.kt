@@ -6,6 +6,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.internal.wait
+import java.util.concurrent.TimeUnit
 
 suspend fun main(args: Array<String>) {
   val geminiBody = "{\"contents\": [{ \"parts\": [{\"text\": \"${args[0]}\"}] }]}"
@@ -13,7 +15,7 @@ suspend fun main(args: Array<String>) {
       """{
     "model": "deepseek-r1-distill-qwen-14b",
     "messages": [
-    { "role": "user", "content": "How to learn Kotlin?" }
+    { "role": "user", "content": "What was Issac Newton's biggest achievement?" }
     ],
     "temperature": 0.7,
     "max_tokens": 5000,
@@ -46,7 +48,11 @@ suspend fun callLocalLLM(input: String): String {
   val url = "http://localhost:1234/api/v0/chat/completions"
   val request =
       Request.Builder().url(url).post(input.toRequestBody("application/json".toMediaType())).build()
-  val client = OkHttpClient()
+  val client = OkHttpClient.Builder()
+      .connectTimeout(60, TimeUnit.SECONDS)
+      .writeTimeout(60, TimeUnit.SECONDS)
+      .readTimeout(60, TimeUnit.SECONDS)
+      .build()
 
   client.newCall(request).execute().use { response ->
     if (!response.isSuccessful) {
