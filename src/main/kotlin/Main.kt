@@ -43,7 +43,7 @@ fun callGemini(input: String): String {
   }
 }
 
-suspend fun callLocalLLM(input: String): String {
+fun callLocalLLM(input: String): String {
   val logger = KotlinLogging.logger {}
   val url = "http://localhost:1234/api/v0/chat/completions"
   val request =
